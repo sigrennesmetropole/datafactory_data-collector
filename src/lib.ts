@@ -156,7 +156,7 @@ async function* download(
     }
     if(opts.tube == "idea_prod_latest"){
       if(!!res.fileName){
-        var myRegexp = new RegExp("(?:^|\s|\/)PRODUCTEUR_(.*?)\.(txt|csv)", "g");
+        var myRegexp = new RegExp("(?:^|\s|\/)tbl_Producteurs_(.*?)\.(txt|csv)", "g");
         var match = myRegexp.exec(res.fileName);
         if(!!match){
           options.datePhoto = match[1];
@@ -172,7 +172,7 @@ async function* download(
     }
     if(opts.tube == "idea_recip_latest"){
       if(!!res.fileName){
-        var myRegexp = new RegExp("(?:^|\s|\/)BAC_(.*?)\.(txt|csv)", "g");
+        var myRegexp = new RegExp("(?:^|\s|\/)tbl_Récipients_pucés_(.*?)\.(txt|csv)", "g");
         var match = myRegexp.exec(res.fileName);
         if(!!match){
           options.datePhoto = match[1];
