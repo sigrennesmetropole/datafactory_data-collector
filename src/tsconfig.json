@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2019",
+    "moduleResolution": "Node",
+    "module": "CommonJS",
+    "outDir": "../dist",
+    "sourceMap": true,
+    "useUnknownInCatchVariables": false
+  }
+}

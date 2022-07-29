@@ -1,0 +1,14 @@
+#FROM          node:12.9.1-alpine
+FROM          node:12.20.0-buster
+RUN           apt-get update && apt-get install -y python2
+RUN           mkdir -p /home/node/app
+WORKDIR       /home/node/app
+COPY          package.json /home/node/app
+RUN           yarn
+COPY          . /home/node/app
+RUN           yarn package
+
+FROM          alpine:3.12.0
+COPY --from=0 /home/node/app/http-reaper /usr/local/bin/data-collector
+ENV           NODE_ENV=production
+ENTRYPOINT    [ "data-collector" ]
