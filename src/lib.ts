@@ -186,9 +186,6 @@ async function* download(
       }
       await logForIdeaRecipient(res, url);
     }
-    if(opts.tube == "idea_exutoire_latest"){
-      await logForIdeaExutoire(res, url);
-    }
     const payload = await transform(res.payload, options);
     yield [res, payload];
   }
