@@ -187,19 +187,6 @@ async function* download(
       await logForIdeaRecipient(res, url);
     }
     if(opts.tube == "idea_exutoire_latest"){
-      if(!!res.fileName){
-        var myRegexp = new RegExp("(?:^|\s|\/)EXUTOIRES_(.*?)\.(txt|csv)", "g");
-        var match = myRegexp.exec(res.fileName);
-        if(!!match){
-          options.datePhoto = match[1];
-        }
-      }
-      if(!options.datePhoto){
-        d("Le format du nom de fichier ne correspond pas à l'attendu.")
-        continue;
-      } else {
-        d("Le format du nom de fichier correspond "+ options.datePhoto)
-      }
       await logForIdeaExutoire(res, url);
     }
     const payload = await transform(res.payload, options);
