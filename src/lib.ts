@@ -426,46 +426,46 @@ async function logForIdeaRecipient(res: connector.IResponse, url: string) {
       },
     });
 }
-async function logForIdeaExutoire(res: connector.IResponse, url: string) {
-  var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
-    var rowsNumber =  datas.length -1;
-    stdout({ complete: 1, code: 1, description: `${rowsNumber} rows downloaded from ${url}.` });
-    type ITableRow = [string, string, string, string, string, string, string, string, string, string];
-    const rows: ITableRow[] = [];
-    for await (const row of datas.slice(1,10)) {
-      var rowFormated = row.split(";");
-      rows.push([
-        rowFormated[0],
-        rowFormated[1],
-        rowFormated[2],
-        rowFormated[3],
-        rowFormated[4],
-        rowFormated[5],
-        rowFormated[6],
-        rowFormated[7],
-        rowFormated[8],
-        rowFormated[9]
-      ]);
-    };
-    stdout({
-      table: {
-        title: 'Aperçu des données exutoires collectées',
-        header: [ 
-          'immat',
-          'date_Service_Vehic',
-          'code_Tournee',
-          'km_Realise',
-          'no_Bon',
-          'lot',
-          'service',
-          'nom_Rech_Lieu_De_Vidage',
-          'multiples_Lignes',
-          'cle_Unique_Ligne_Ticket'
-        ],
-        rows,
-      },
-    });
-  }
+// async function logForIdeaExutoire(res: connector.IResponse, url: string) {
+//   var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
+//     var rowsNumber =  datas.length -1;
+//     stdout({ complete: 1, code: 1, description: `${rowsNumber} rows downloaded from ${url}.` });
+//     type ITableRow = [string, string, string, string, string, string, string, string, string, string];
+//     const rows: ITableRow[] = [];
+//     for await (const row of datas.slice(1,10)) {
+//       var rowFormated = row.split(";");
+//       rows.push([
+//         rowFormated[0],
+//         rowFormated[1],
+//         rowFormated[2],
+//         rowFormated[3],
+//         rowFormated[4],
+//         rowFormated[5],
+//         rowFormated[6],
+//         rowFormated[7],
+//         rowFormated[8],
+//         rowFormated[9]
+//       ]);
+//     };
+//     stdout({
+//       table: {
+//         title: 'Aperçu des données exutoires collectées',
+//         header: [ 
+//           'immat',
+//           'date_Service_Vehic',
+//           'code_Tournee',
+//           'km_Realise',
+//           'no_Bon',
+//           'lot',
+//           'service',
+//           'nom_Rech_Lieu_De_Vidage',
+//           'multiples_Lignes',
+//           'cle_Unique_Ligne_Ticket'
+//         ],
+//         rows,
+//       },
+//     });
+//   }
 
 // 'download' is exported for test-purposes only
 export { download, httpReaper };
