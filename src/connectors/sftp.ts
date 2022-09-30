@@ -60,7 +60,7 @@ export class Sftp {
         .then(()=>{
           return this._client.list(path, regex) as unknown as SFTP_IFtpFile[]
         })
-        await this._client.end
+        await this._client.end()
         if (watermark !== undefined) {
           return list
             .sort((a, b) => {
@@ -84,7 +84,7 @@ export class Sftp {
       console.log("readOptions "+readOptions)
       return this._client.get(filepath, undefined, readOptions) as unknown as Buffer
     })
-    this._client.end
+    this._client.end()
     return stream
   }
 }
@@ -94,7 +94,7 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
     if (url.path == null) {
       throw new Error('You must specify a filepath in the url');
     }
-    var client = new Sftp()
+    var client = await new Sftp()
     const arr = (url.path as string).split("/")
     const path = arr.splice(0, arr.length - 1).join("/")
     const regex = arr.pop() as string
