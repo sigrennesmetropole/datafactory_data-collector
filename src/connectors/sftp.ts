@@ -115,7 +115,7 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
         }
       }
     }
-    const files = await client.list(path, regex, config, watermark)
+    const files = await retry(client.list, [path, regex, config, watermark], 3)
     client = new Sftp() //car il est préférable de ne pas réutiliser un objet pour plusieurs connexion
     for (const file of files) {
         yield {
@@ -123,7 +123,7 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
           code: 200,
           time: file.modifyTime,
           status: 'OK',
-          payload: await client.get(path +"/"+file.name,config, readOption),
+          payload: await retry(client.get,[path +"/"+file.name,config, readOption], 3),
           fileName : file.name,
         };
     }
@@ -131,6 +131,29 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
   } catch (err) {
     d("probleme lors de la recuperation des fichiers du SFTP : " + err)
     throw err;
+  }
+}
+
+/**
+ * Retries a function n number of times before giving up
+ */
+ export async function retry<T extends (...arg0: any[]) => any>(
+  fn: T,
+  args: Parameters<T>,
+  maxTry: number,
+  retryCount = 1
+): Promise<Awaited<ReturnType<T>>> {
+  const currRetry = typeof retryCount === 'number' ? retryCount : 1;
+  try {
+    const result = await fn(...args);
+    return result;
+  } catch (e) {
+    console.log(`Retry ${currRetry} failed.`);
+    if (currRetry > maxTry) {
+      console.log(`All ${maxTry} retry attempts exhausted`);
+      throw e;
+    }
+    return retry(fn, args, maxTry, currRetry + 1);
   }
 }
 
