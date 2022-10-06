@@ -58,7 +58,7 @@ export class Sftp {
         d(`with regex : ${regex}`)
         const list = await this._client.connect(config)
         .then(()=>{
-          return this._client.list(path, regex) as unknown as SFTP_IFtpFile[]
+          return retry(this._client.list,[path, regex],3) as unknown as SFTP_IFtpFile[]
         })
         await this._client.end()
         if (watermark !== undefined) {
@@ -79,10 +79,10 @@ export class Sftp {
 
   async get(filepath: string, config: Client.ConnectOptions, readOptions: Client.TransferOptions): Promise<Buffer> {
     d(`get: ${filepath}`);
-    const stream = await this._client.connect(config)
+    const stream = await retry(this._client.connect, [config], 3)
     .then(()=> {
       console.log("readOptions "+readOptions)
-      return this._client.get(filepath, undefined, readOptions) as unknown as Buffer
+      return retry(this._client.get,[filepath, undefined, readOptions], 3) as unknown as Buffer
     })
     this._client.end()
     return stream
@@ -115,15 +115,15 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
         }
       }
     }
-    const files = await retry(client.list, [path, regex, config, watermark], 3)
-    client = await new Sftp() //car il est préférable de ne pas réutiliser un objet pour plusieurs connexion
+    const files = await client.list(path, regex, config, watermark)
+    client = new Sftp() //car il est préférable de ne pas réutiliser un objet pour plusieurs connexion
     for (const file of files) {
         yield {
           type: 'sftp',
           code: 200,
           time: file.modifyTime,
           status: 'OK',
-          payload: await retry(client.get,[path +"/"+file.name,config, readOption], 3),
+          payload: await client.get(path +"/"+file.name,config, readOption),
           fileName : file.name,
         };
     }
@@ -133,6 +133,8 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
     throw err;
   }
 }
+
+export default sftpDownload;
 
 /**
  * Retries a function n number of times before giving up
@@ -156,5 +158,3 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
     return retry(fn, args, maxTry, currRetry + 1);
   }
 }
-
-export default sftpDownload;
