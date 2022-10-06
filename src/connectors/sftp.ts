@@ -58,7 +58,7 @@ export class Sftp {
         d(`with regex : ${regex}`)
         const list = await this._client.connect(config)
         .then(()=>{
-          return retry(this._client.list,[path, regex],3) as unknown as SFTP_IFtpFile[]
+          return this._client.list(path, regex) as unknown as SFTP_IFtpFile[]
         })
         await this._client.end()
         if (watermark !== undefined) {
@@ -79,10 +79,10 @@ export class Sftp {
 
   async get(filepath: string, config: Client.ConnectOptions, readOptions: Client.TransferOptions): Promise<Buffer> {
     d(`get: ${filepath}`);
-    const stream = await retry(this._client.connect, [config], 3)
+    const stream = await this._client.connect(config)
     .then(()=> {
       console.log("readOptions "+readOptions)
-      return retry(this._client.get,[filepath, undefined, readOptions], 3) as unknown as Buffer
+      return this._client.get(filepath, undefined, readOptions) as unknown as Buffer
     })
     this._client.end()
     return stream
@@ -135,26 +135,3 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
 }
 
 export default sftpDownload;
-
-/**
- * Retries a function n number of times before giving up
- */
- export async function retry<T extends (...arg0: any[]) => any>(
-  fn: T,
-  args: Parameters<T>,
-  maxTry: number,
-  retryCount = 1
-): Promise<Awaited<ReturnType<T>>> {
-  const currRetry = typeof retryCount === 'number' ? retryCount : 1;
-  try {
-    const result = await fn(...args);
-    return result;
-  } catch (e) {
-    console.log(`Retry ${currRetry} failed.`);
-    if (currRetry > maxTry) {
-      console.log(`All ${maxTry} retry attempts exhausted`);
-      throw e;
-    }
-    return retry(fn, args, maxTry, currRetry + 1);
-  }
-}
