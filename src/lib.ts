@@ -273,7 +273,7 @@ async function logForTraffic(res: connector.IResponse, url: String) {
   var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
     var rowsNumber =  datas.length -1; 
 
-    stdout({ complete: 1, code: 1, description: `${rowsNumber} rows downloaded from ${url}.` });
+  stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
     type ITableRow = [string, string, number, number, number, string];
     const rows: ITableRow[] = [];
     for await (const row of datas.slice(1,10)) {
@@ -306,7 +306,7 @@ async function logForTraffic(res: connector.IResponse, url: String) {
 async function logForIdea(res: connector.IResponse, url: string) {
   var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
     var rowsNumber =  datas.length -1;
-    stdout({ complete: 1, code: 1, description: `${rowsNumber} rows downloaded from ${url}.` });
+  stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
     type ITableRow = [string, string, string, string, string, string, string, string, string, string, string, string, string, string, string];
     const rows: ITableRow[] = [];
     for await (const row of datas.slice(1,10)) {
@@ -358,7 +358,7 @@ async function logForIdea(res: connector.IResponse, url: string) {
 async function logForIdeaProducer(res: connector.IResponse, url: string) {
   var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
     var rowsNumber =  datas.length -1;
-    stdout({ complete: 1, code: 1, description: `${rowsNumber} rows downloaded from ${url}.` });
+  stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
     type ITableRow = [string, string, string, string, string, string, string, string];
     const rows: ITableRow[] = [];
     for await (const row of datas.slice(1,10)) {
@@ -395,7 +395,7 @@ async function logForIdeaProducer(res: connector.IResponse, url: string) {
 async function logForIdeaRecipient(res: connector.IResponse, url: string) {
   var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
     var rowsNumber =  datas.length -1;
-    stdout({ complete: 1, code: 1, description: `${rowsNumber} rows downloaded from ${url}.` });
+  stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
     type ITableRow = [string, string, string, string, string, string, string];
     const rows: ITableRow[] = [];
     for await (const row of datas.slice(1,10)) {
@@ -429,7 +429,7 @@ async function logForIdeaRecipient(res: connector.IResponse, url: string) {
 // async function logForIdeaExutoire(res: connector.IResponse, url: string) {
 //   var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
 //     var rowsNumber =  datas.length -1;
-//     stdout({ complete: 1, code: 1, description: `${rowsNumber} rows downloaded from ${url}.` });
+//     stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
 //     type ITableRow = [string, string, string, string, string, string, string, string, string, string];
 //     const rows: ITableRow[] = [];
 //     for await (const row of datas.slice(1,10)) {
