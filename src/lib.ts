@@ -89,7 +89,7 @@ export interface IOptions extends ISensitiveOptions {
    * than this saved watermark.
    */
   watermark?: boolean;
-  
+
   encoding?: string;
 
   datePhoto?: string;
@@ -185,6 +185,30 @@ async function* download(
         d("Le format du nom de fichier correspond "+ options.datePhoto)
       }
       await logForIdeaRecipient(res, url);
+    }
+    if(opts.tube == "idea_exutoire_latest"){
+      if(!!res.fileName){
+        var myRegexp = new RegExp("(?:^|\s|\/)EXUTOIRES_(.*?)\.(txt|csv)", "g");
+        var match = myRegexp.exec(res.fileName);
+        if(!!match){
+          options.datePhoto = match[1];
+        }
+      }
+      if(!options.datePhoto){
+        d("Le format du nom de fichier ne correspond pas à l'attendu.")
+        continue;
+      } else {
+        d("Le format du nom de fichier correspond "+ options.datePhoto)
+      }
+      await logForIdeaExutoire(res, url);
+    }
+    if (opts.tube == "air_latest") {
+      if (!!res.fileName) {
+        var myRegexp = new RegExp("(?:^|\s|\/)test_air_(.*?)\.(txt|csv)", "g");
+        var match = myRegexp.exec(res.fileName);
+      }
+      d("Le format du nom de fichier correspond " + options.datePhoto)
+      await logForQAir(res, url);
     }
     const payload = await transform(res.payload, options);
     yield [res, payload];
@@ -426,46 +450,80 @@ async function logForIdeaRecipient(res: connector.IResponse, url: string) {
       },
     });
 }
-// async function logForIdeaExutoire(res: connector.IResponse, url: string) {
-//   var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
-//     var rowsNumber =  datas.length -1;
-//     stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
-//     type ITableRow = [string, string, string, string, string, string, string, string, string, string];
-//     const rows: ITableRow[] = [];
-//     for await (const row of datas.slice(1,10)) {
-//       var rowFormated = row.split(";");
-//       rows.push([
-//         rowFormated[0],
-//         rowFormated[1],
-//         rowFormated[2],
-//         rowFormated[3],
-//         rowFormated[4],
-//         rowFormated[5],
-//         rowFormated[6],
-//         rowFormated[7],
-//         rowFormated[8],
-//         rowFormated[9]
-//       ]);
-//     };
-//     stdout({
-//       table: {
-//         title: 'Aperçu des données exutoires collectées',
-//         header: [ 
-//           'immat',
-//           'date_Service_Vehic',
-//           'code_Tournee',
-//           'km_Realise',
-//           'no_Bon',
-//           'lot',
-//           'service',
-//           'nom_Rech_Lieu_De_Vidage',
-//           'multiples_Lignes',
-//           'cle_Unique_Ligne_Ticket'
-//         ],
-//         rows,
-//       },
-//     });
-//   }
+async function logForIdeaExutoire(res: connector.IResponse, url: string) {
+  var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
+    var rowsNumber =  datas.length -1;
+  stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
+    type ITableRow = [string, string, string, string, string, string, string, string, string, string];
+    const rows: ITableRow[] = [];
+    for await (const row of datas.slice(1,10)) {
+      var rowFormated = row.split(";");
+      rows.push([
+        rowFormated[0],
+        rowFormated[1],
+        rowFormated[2],
+        rowFormated[3],
+        rowFormated[4],
+        rowFormated[5],
+        rowFormated[6],
+        rowFormated[7],
+        rowFormated[8],
+        rowFormated[9]
+      ]);
+    };
+    stdout({
+      table: {
+        title: 'Aperçu des données exutoires collectées',
+        header: [ 
+          'immat',
+          'date_Service_Vehic',
+          'code_Tournee',
+          'km_Realise',
+          'no_Bon',
+          'lot',
+          'service',
+          'nom_Rech_Lieu_De_Vidage',
+          'multiples_Lignes',
+          'cle_Unique_Ligne_Ticket'
+        ],
+        rows,
+      },
+    });
+  }
+async function logForQAir(res: connector.IResponse, url: string) {
+  var datas = res.payload.toString().replace(/(\r)/gm, "").split("\n");
+  var rowsNumber = datas.length - 1;
+  stdout({ progress:0.5, description: `${rowsNumber} rows downloaded froms ${url}.` });
+  type ITableRow = [string, string, string, string, string, string, string];
+  const rows: ITableRow[] = [];
+  for await (const row of datas.slice(1, 10)) {
+    var rowFormated = row.split(";");
+    rows.push([
+      rowFormated[0],
+      rowFormated[1],
+      rowFormated[2],
+      rowFormated[3],
+      rowFormated[4],
+      rowFormated[5],
+      rowFormated[6]
+    ]);
+  };
+  stdout({
+    table: {
+      title: "Aperçu des données qualité de l'air collectées",
+      header: [
+        'numins',
+        'identifier',
+        'ref_externe_1',
+        'libelle_propriete',
+        'date_heure',
+        'valeur',
+        'unite'
+      ],
+      rows,
+    },
+  });
+}
 
 // 'download' is exported for test-purposes only
 export { download, httpReaper };

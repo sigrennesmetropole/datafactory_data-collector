@@ -1,6 +1,7 @@
 import zlib from 'zlib';
 import { promisify } from 'util';
 import { ISecuredOptions } from './lib';
+
 const gzip = promisify<Buffer, Buffer>(zlib.gzip);
 
 /**
@@ -63,7 +64,6 @@ export default async function transform(payload: Buffer, opts: ISecuredOptions):
   if(!!opts.datePhoto && !!opts.csvDelimiter && !!opts.csvHasHeader && opts.tube!='idea_exutoire_latest'){
     payload = addDatePhoto(payload, opts.datePhoto, opts.csvDelimiter, opts.csvHasHeader);
   }
-
   return opts.gzip ? await gzip(payload) : payload;
 }
 
