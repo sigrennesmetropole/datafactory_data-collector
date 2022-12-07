@@ -204,7 +204,7 @@ async function* download(
     }
     if (opts.tube == "air_latest") {
       if (!!res.fileName) {
-        var myRegexp = new RegExp("(?:^|\s|\/)test_air_(.*?)\.(txt|csv)", "g");
+        var myRegexp = new RegExp("(?:^|\s|\/)amplisim_(.*?)\.(txt|csv)", "g");
         var match = myRegexp.exec(res.fileName);
       }
       d("Le format du nom de fichier correspond " + options.datePhoto)

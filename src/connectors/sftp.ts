@@ -105,6 +105,8 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
       password: opts.password
     }
     const files = await client.list(path, regex, config, watermark)
+    d(`File(s) find :`)
+    d(files)
     client = new Sftp() //car il est préférable de ne pas réutiliser un objet pour plusieurs connexion
     for (const file of files) {
         yield {
