@@ -15,34 +15,6 @@ export interface SFTP_IFtpResponse {
   fileName?: string;
 }
 
-export interface OPTS_connect {
-  host: string | undefined;
-  port: number | undefined;
-  username: string | undefined;
-  password: string | undefined;
-}
-
-export interface SFTP_IFtpFilePermissions {
-  read: boolean;
-  write: boolean;
-  exec: boolean;
-}
-
-export interface SFTP_IFtpFile {
-  type: string// file type(-, d, l)
-  name: string// file name
-  size: number// file size
-  modifyTime: number // file timestamp of modified time
-  accessTime: number// file timestamp of access time
-  rights: {
-    user: string
-    group: string
-    other: string
-  },
-  owner: string // user ID
-  group: string// group ID
-}
-
 export class Sftp {
   public _client: Client;
 
@@ -52,13 +24,13 @@ export class Sftp {
   async connect(opts:any){
    return await this._client.connect(opts)
   }
-  async list(path: string,regex: string, config: OPTS_connect, watermark?: number): Promise<SFTP_IFtpFile[]> {
+  async list(path: string, regex: string, config: Client.ConnectOptions, watermark?: number): Promise<Client.FileInfo[]> {
     try{
         d("Listing directory [%s]", path);
         d(`with regex : ${regex}`)
         const list = await this._client.connect(config)
-        .then(()=>{
-          return this._client.list(path, regex) as unknown as SFTP_IFtpFile[]
+        .then(async ()=>{
+          return await this._client.list(path, regex)
         })
         await this._client.end()
         if (watermark !== undefined) {
@@ -77,11 +49,11 @@ export class Sftp {
     }
   }
 
-  async get(filepath: string, config: OPTS_connect): Promise<Buffer> {
+  async get(filepath: string, config: Client.ConnectOptions, readOptions: Client.TransferOptions): Promise<Buffer> {
     d(`get: ${filepath}`);
     const stream = await this._client.connect(config)
-    .then(()=> {
-      return this._client.get(filepath, undefined) as unknown as Buffer
+      .then(async ()=> {
+        return await this._client.get(filepath, undefined) as unknown as Buffer
     })
     await this._client.end()
     return stream
@@ -98,12 +70,23 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
     const path = arr.splice(0, arr.length - 1).join("/")
     const regex = arr.pop() as string
     const watermark = opts.watermark ? await db.getWatermark(url.href) : undefined;
-    const config: OPTS_connect={
+    const config: Client.ConnectOptions={
       host: url.hostname ?? undefined,
       port: url.port ? parseInt(url.port, 10) : undefined,
       username: opts.username,
-      password: opts.password
+      password: opts.password,
+      retries: 2, // integer. Number of times to retry connecting
+      retry_factor: 2, // integer. Time factor used to calculate time between retries
+      retry_minTimeout: 2000 // integer. Minimum timeout between attempts
     }
+    let readOption: Client.TransferOptions = {};
+    if (!!opts.encoding) {
+      console.log("Encoding " + opts.encoding)
+      readOption = {
+        readStreamOptions: {
+          encoding: opts.encoding
+        }
+      }
     const files = await client.list(path, regex, config, watermark)
     d(`File(s) find :`)
     d(files)
@@ -114,7 +97,7 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
           code: 200,
           time: file.modifyTime,
           status: 'OK',
-          payload: await client.get(path +"/"+file.name,config),
+          payload: await client.get(path + "/" + file.name, config, readOption),
           fileName : file.name,
         };
     }
