@@ -156,14 +156,14 @@ async function* download(
     }
     if(opts.tube == "idea_prod_latest"){
       if(!!res.fileName){
-        var myRegexp = new RegExp("(?:^|\s|\/)tbl_Producteurs_(.*?)\.(txt|csv)", "g");
+        var myRegexp = new RegExp("(?:^|\s|\/)tbl_Producteurs_(.*?)(_.*?)?\.(txt|csv)", "g");
         var match = myRegexp.exec(res.fileName);
         if(!!match){
           options.datePhoto = match[1];
         }
       }
       if(!options.datePhoto){
-        d("Le format du nom de fichier ne correspond pas à l'attendu.")
+        d("Le format du nom de fichier ne correspond pas à l'attendu :" + res.fileName)
         continue;
       } else {
         d("Le format du nom de fichier correspond "+ options.datePhoto)
@@ -172,14 +172,14 @@ async function* download(
     }
     if(opts.tube == "idea_recip_latest"){
       if(!!res.fileName){
-        var myRegexp = new RegExp("(?:^|\s|\/)tbl_Récipients_pucés_(.*?)\.(txt|csv)", "g");
+        var myRegexp = new RegExp("(?:^|\s|\/)tbl_Récipients_pucés_(.*?)(_.*?)?\.(txt|csv)", "g");
         var match = myRegexp.exec(res.fileName);
         if(!!match){
           options.datePhoto = match[1];
         }
       }
       if(!options.datePhoto){
-        d("Le format du nom de fichier ne correspond pas à l'attendu.")
+        d("Le format du nom de fichier ne correspond pas à l'attendu :" + res.fileName)
         continue;
       } else {
         d("Le format du nom de fichier correspond "+ options.datePhoto)
@@ -188,14 +188,14 @@ async function* download(
     }
     if(opts.tube == "idea_exutoire_latest"){
       if(!!res.fileName){
-        var myRegexp = new RegExp("(?:^|\s|\/)EXUTOIRES_(.*?)\.(txt|csv)", "g");
+        var myRegexp = new RegExp("(?:^|\s|\/)SUEZ PAP (.*?)( .*?)?\.(txt|csv)", "g");
         var match = myRegexp.exec(res.fileName);
         if(!!match){
           options.datePhoto = match[1];
         }
       }
       if(!options.datePhoto){
-        d("Le format du nom de fichier ne correspond pas à l'attendu.")
+        d("Le format du nom de fichier ne correspond pas à l'attendu :" + res.fileName)
         continue;
       } else {
         d("Le format du nom de fichier correspond "+ options.datePhoto)
@@ -204,7 +204,7 @@ async function* download(
     }
     if (opts.tube == "air_latest") {
       if (!!res.fileName) {
-        var myRegexp = new RegExp("(?:^|\s|\/)amplisim_(.*?)\.(txt|csv)", "g");
+        var myRegexp = new RegExp("(?:^|\s|\/)amplisim_(.*?)(_.*?)?\.(txt|csv)", "g");
         var match = myRegexp.exec(res.fileName);
       }
       d("Le format du nom de fichier correspond " + options.datePhoto)

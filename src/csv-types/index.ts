@@ -80,6 +80,9 @@ function validateCol(
   value: string,
   type: CsvType
 ): CsvError[] {
+  if (type == undefined) {
+    return []
+  }
   switch (type.type) {
     case 'Date': {
       const res = Date.parse(value);
@@ -166,7 +169,7 @@ export function validate(
   cols: string[],
   types: CsvType[]
 ): CsvError[] {
-  if (cols.length !== types.length) {
+  if (cols.length < types.length) {
     return [new CsvColMismatchError(rowIdx, cols.length, types.length)];
   }
   return cols.reduce((errors, value, colIdx) => {

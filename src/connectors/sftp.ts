@@ -87,6 +87,7 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
           encoding: opts.encoding
         }
       }
+  
     const files = await client.list(path, regex, config, watermark)
     d(`File(s) find :`)
     d(files)
@@ -101,7 +102,7 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
           fileName : file.name,
         };
     }
-
+  }
   } catch (err) {
     d("probleme lors de la recuperation des fichiers du SFTP : " + err)
     throw err;
