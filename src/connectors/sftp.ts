@@ -53,7 +53,7 @@ export class Sftp {
     d(`get: ${filepath}`);
     const stream = await this._client.connect(config)
       .then(async ()=> {
-        return await this._client.get(filepath, undefined) as unknown as Buffer
+        return await this._client.get(filepath, undefined, readOptions) as unknown as Buffer
     })
     await this._client.end()
     return stream
