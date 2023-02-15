@@ -141,7 +141,7 @@ async function* download(
   d(`download: ${url}`);
   const responses = connector.download(url, opts);
   for await (const res of responses) {
-    d(`process ${url}`);
+    d(`process ${url} - ${res.fileName}`);
     const error = await validator(url, res, options);
     if (error) {
       throw error;
