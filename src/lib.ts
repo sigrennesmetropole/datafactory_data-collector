@@ -203,11 +203,21 @@ async function* download(
       await logForIdeaExutoire(res, url);
     }
     if (opts.tube == "air_latest") {
+      var fullname = null
       if (!!res.fileName) {
         var myRegexp = new RegExp("(?:^|\s|\/)amplisim_(.*?)(_.*?)?\.(txt|csv)", "g");
         var match = myRegexp.exec(res.fileName);
+        if (!!match) {
+          fullname = match[0]
+        }
       }
-      d("Le format du nom de fichier correspond " + options.datePhoto)
+      if (!!fullname) {
+        d(fullname)
+        d("Le format du nom de fichier correspond " + res.fileName)
+      } else {
+        d("Le format du nom de fichier ne correspond pas à l'attendu " + res.fileName)
+        continue;
+      }
       await logForQAir(res, url);
     }
     const payload = await transform(res.payload, options);
