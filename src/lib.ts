@@ -308,7 +308,7 @@ async function logForTraffic(res: connector.IResponse, url: String) {
     var rowsNumber =  datas.length -1; 
 
   stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
-    type ITableRow = [string, string, number, number, number, string];
+    type ITableRow = [string, string, number, number, number, string, number];
     const rows: ITableRow[] = [];
     for await (const row of datas.slice(1,10)) {
       var rowFormated = row.split(";");
@@ -318,7 +318,8 @@ async function logForTraffic(res: connector.IResponse, url: String) {
         Number(rowFormated[2]),
         Number(rowFormated[3]),
         Number(rowFormated[4]),
-        rowFormated[5]
+        rowFormated[5],
+        Number(rowFormated[6])
       ]);
     };
     stdout({
@@ -330,7 +331,8 @@ async function logForTraffic(res: connector.IResponse, url: String) {
           'Average vehicle speed',
           'Travel time',
           'Travel time reliability',
-          'Traffic status'
+          'Traffic status',
+          'vehicle Probe Measurement'
         ],
         rows,
       },
