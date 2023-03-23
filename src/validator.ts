@@ -18,7 +18,7 @@ function csvHeadersValidator(payload: string, headers: string, csvdelimiter: str
     delimiter = csvdelimiter;
   }
   var payloads = payload.toLowerCase().split("\n")[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(new RegExp("\"", 'g'), "").replace(new RegExp("\\r", 'g'), "").replace(new RegExp(" ", 'g'), "_").split(delimiter) // met tout en minuscule, enlève les accents, enlève les " en trop, enleève le \r de fin et remplace les espaces par des _, puis split par le delimiter
-  return headers.split(delimiter).every(r => payloads.includes(r)); // selectionne le header du fichier csv renvoyé, et compare chaque element avec celui du header qu'il faut. Si toutes les colonnes sont présente, alors ont renvoie true
+  return headers.toLowerCase().split(delimiter).every(r => payloads.includes(r)); // selectionne le header du fichier csv renvoyé, et compare chaque element avec celui du header qu'il faut. Si toutes les colonnes sont présente, alors ont renvoie true
 }
 
 async function csvColumnsValidator(
