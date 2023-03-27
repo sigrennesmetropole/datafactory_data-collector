@@ -13,7 +13,7 @@ function httpValidator(code: number): boolean {
   return code >= 200 && code < 400;
 }
 
-function csvHeadersValidator(payload: string, headers: string, csvdelimiter: string | undefined): boolean {
+function csvHeadersValidator(payload: Buffer, headers: string, csvdelimiter: string | undefined): boolean {
   var delimiter = ";";
   if (csvdelimiter != undefined) {
     delimiter = csvdelimiter;
