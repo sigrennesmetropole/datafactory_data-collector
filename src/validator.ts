@@ -80,7 +80,7 @@ export default async function validate(
   }
 
   if (opts.csvHeaders) {
-    if (!csvHeadersValidator(res.payload.toString(), opts.csvHeaders, opts.csvDelimiter)) {
+    if (!csvHeadersValidator(res.payload, opts.csvHeaders, opts.csvDelimiter)) {
       return {
         ...defaultMsg,
         errors: [`mismatched csv headers (expected: ${opts.csvHeaders})`],
