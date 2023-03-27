@@ -7,6 +7,7 @@ import { IErrorMsg, ISecuredOptions } from './lib';
 import { PassThrough } from 'stream';
 import { CsvError } from './csv-types/errors';
 import { IResponse } from './connectors';
+import iconv from 'iconv-lite';
 
 function httpValidator(code: number): boolean {
   return code >= 200 && code < 400;
@@ -17,7 +18,10 @@ function csvHeadersValidator(payload: string, headers: string, csvdelimiter: str
   if (csvdelimiter != undefined) {
     delimiter = csvdelimiter;
   }
-  var payloads = payload.toLowerCase().split("\n")[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(new RegExp("\"", 'g'), "").replace(new RegExp("\\r", 'g'), "").replace(new RegExp(" ", 'g'), "_").split(delimiter) // met tout en minuscule, enlève les accents, enlève les " en trop, enleève le \r de fin et remplace les espaces par des _, puis split par le delimiter
+  const header = iconv.decode(payload, 'latin1').split("\n")[0]
+
+  var payloads = header.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(new RegExp("\"", 'g'), "").replace(new RegExp("\\r", 'g'), "").replace(new RegExp(" ", 'g'), "_").toLowerCase().split(delimiter) // met tout en minuscule, enlève les accents, enlève les " en trop, enleève le \r de fin et remplace les espaces par des _, puis split par le delimiter
+
   return headers.toLowerCase().split(delimiter).every(r => payloads.includes(r)); // selectionne le header du fichier csv renvoyé, et compare chaque element avec celui du header qu'il faut. Si toutes les colonnes sont présente, alors ont renvoie true
 }
 
