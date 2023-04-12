@@ -93,7 +93,6 @@ export interface IOptions extends ISensitiveOptions {
   encoding?: string;
 
   datePhoto?: string;
-
 }
 
 export interface IErrorMsg {
@@ -185,6 +184,22 @@ async function* download(
         d("Le format du nom de fichier correspond "+ options.datePhoto)
       }
       await logForIdeaRecipient(res, url);
+    }
+    if (opts.tube == "idea_recip_latest_no_puce") {
+      if (!!res.fileName) {
+        var myRegexp = new RegExp("(?:^|\s|\/)tbl_Récipients_non_pucés_(.*?)(_.*?)?\.(txt|csv)", "g");
+        var match = myRegexp.exec(res.fileName);
+        if (!!match) {
+          options.datePhoto = match[1];
+        }
+      }
+      if (!options.datePhoto) {
+        d("Le format du nom de fichier ne correspond pas à l'attendu :" + res.fileName)
+        continue;
+      } else {
+        d("Le format du nom de fichier correspond " + options.datePhoto)
+      }
+      await logForIdeaRecipientNonPuce(res, url);
     }
     if(opts.tube == "idea_exutoire_latest"){
       if(!!res.fileName){
@@ -395,7 +410,7 @@ async function logForIdeaProducer(res: connector.IResponse, url: string) {
   var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");
     var rowsNumber =  datas.length -1;
   stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
-    type ITableRow = [string, string, string, string, string, string, string, string];
+  type ITableRow = [string, string, string, string, string, string, string, string, string];
     const rows: ITableRow[] = [];
     for await (const row of datas.slice(1,10)) {
       var rowFormated = row.split(";");
@@ -407,7 +422,8 @@ async function logForIdeaProducer(res: connector.IResponse, url: string) {
         rowFormated[4],
         rowFormated[5],
         rowFormated[6],
-        rowFormated[7]
+        rowFormated[7],
+        rowFormated[8]
       ]);
     };
     stdout({
@@ -421,7 +437,8 @@ async function logForIdeaProducer(res: connector.IResponse, url: string) {
           'type_producteur',
           'activite',
           'longitude',
-          'latitude'
+          'latitude',
+          'numero'
         ],
         rows,
       },
@@ -461,6 +478,42 @@ async function logForIdeaRecipient(res: connector.IResponse, url: string) {
         rows,
       },
     });
+}
+
+async function logForIdeaRecipientNonPuce(res: connector.IResponse, url: string) {
+  var datas = res.payload.toString().replace(/(\r)/gm, "").split("\n");
+  var rowsNumber = datas.length - 1;
+
+  stdout({ progress: 0.5, description: `${rowsNumber} rows downloaded from ${url}.` });
+  type ITableRow = [string, string, string, string, string, string, string];
+  const rows: ITableRow[] = [];
+  for await (const row of datas.slice(1, 10)) {
+    var rowFormated = row.split(";");
+    rows.push([
+      rowFormated[0],
+      rowFormated[1],
+      rowFormated[2],
+      rowFormated[3],
+      rowFormated[4],
+      rowFormated[5],
+      rowFormated[6]
+    ]);
+  };
+  stdout({
+    table: {
+      title: 'Aperçu des données récipîents non pucés collectées',
+      header: [
+        'Code producteur',
+        'Catégorie récipient',
+        'Type de récipient',
+        'Litrage récipient',
+        'Code puce',
+        'Fréquence OM',
+        'Fréquence CS'
+      ],
+      rows,
+    },
+  });
 }
 async function logForIdeaExutoire(res: connector.IResponse, url: string) {
   var datas = res.payload.toString().replace(/(\r)/gm,"").split("\n");

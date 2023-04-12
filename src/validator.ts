@@ -7,7 +7,10 @@ import { IErrorMsg, ISecuredOptions } from './lib';
 import { PassThrough } from 'stream';
 import { CsvError } from './csv-types/errors';
 import { IResponse } from './connectors';
-import iconv from 'iconv-lite';
+import debug from 'debug';
+import  iconv  from 'iconv-lite';
+
+const d = debug('validator');
 
 function httpValidator(code: number): boolean {
   return code >= 200 && code < 400;
@@ -15,13 +18,19 @@ function httpValidator(code: number): boolean {
 
 function csvHeadersValidator(payload: Buffer, headers: string, csvdelimiter: string | undefined): boolean {
   var delimiter = ";";
-  if (csvdelimiter != undefined) {
+  if (csvdelimiter!=undefined){
     delimiter = csvdelimiter;
-  }
+  } 
+
   const header = iconv.decode(payload, 'latin1').split("\n")[0]
+  d("decoded payload:header buffer : " + header)
 
   var payloads = header.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(new RegExp("\"", 'g'), "").replace(new RegExp("\\r", 'g'), "").replace(new RegExp(" ", 'g'), "_").toLowerCase().split(delimiter) // met tout en minuscule, enlève les accents, enlève les " en trop, enleève le \r de fin et remplace les espaces par des _, puis split par le delimiter
-
+  
+  d("headers : " + headers)
+  d("header from payloads : " + payloads)
+  d('validate ?:')
+  d(headers.toLowerCase().split(delimiter).every(r => payloads.includes(r)))
   return headers.toLowerCase().split(delimiter).every(r => payloads.includes(r)); // selectionne le header du fichier csv renvoyé, et compare chaque element avec celui du header qu'il faut. Si toutes les colonnes sont présente, alors ont renvoie true
 }
 
@@ -80,6 +89,7 @@ export default async function validate(
   }
 
   if (opts.csvHeaders) {
+    d("validation du header...")
     if (!csvHeadersValidator(res.payload, opts.csvHeaders, opts.csvDelimiter)) {
       return {
         ...defaultMsg,
