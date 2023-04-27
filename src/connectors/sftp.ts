@@ -72,7 +72,6 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
     const watermark = opts.watermark ? await db.getWatermark(url.href) : undefined;
     d("watermark : ");
     d(watermark);
-    d("before config : ");
     const config: Client.ConnectOptions={
       host: url.hostname ?? undefined,
       port: url.port ? parseInt(url.port, 10) : undefined,
@@ -82,7 +81,6 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
       retry_factor: 2, // integer. Time factor used to calculate time between retries
       retry_minTimeout: 2000 // integer. Minimum timeout between attempts
     }
-    d("after config : ");
     let readOption: Client.TransferOptions = {};
     if (!!opts.encoding) {
       console.log("Encoding " + opts.encoding)
@@ -91,7 +89,7 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
           encoding: opts.encoding
         }
       }
-    d("after readOption ");
+  
     const files = await client.list(path, regex, config, watermark)
     d(`File(s) find :`)
     d(files)
