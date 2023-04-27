@@ -104,7 +104,7 @@ function parseArgs(): [string, IOptions] {
   const username     = args['--auth-user'] || process.env.AUTH_USER;
   const password     = args['--auth-pass'] || process.env.AUTH_PASS;
   const watermark    = args['--watermark'] ?? asBoolean(process.env.WATERMARK) ?? false;
-  const encoding     = args['--encoding'] || process.env.ENCODING;
+  const encoding     = args['--encoding'] || process.env.ENCODING ?? undefined;
 
   return [
     args._[0],
