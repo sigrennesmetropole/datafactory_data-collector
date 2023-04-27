@@ -70,6 +70,8 @@ async function* sftpDownload(url: Url, opts: IOptions): AsyncGenerator<SFTP_IFtp
     const path = arr.splice(0, arr.length - 1).join("/")
     const regex = arr.pop() as string
     const watermark = opts.watermark ? await db.getWatermark(url.href) : undefined;
+    d("watermark : ");
+    d(watermark);
     const config: Client.ConnectOptions={
       host: url.hostname ?? undefined,
       port: url.port ? parseInt(url.port, 10) : undefined,

@@ -203,7 +203,7 @@ async function* download(
     }
     if(opts.tube == "idea_exutoire_latest"){
       if(!!res.fileName){
-        var myRegexp = new RegExp("(?:^|\s|\/)SUEZ PAP (.*?)( .*?)?\.(xlsx)", "g");
+        var myRegexp = new RegExp("(?:^|\s|\/)SUEZ_PAP_(.*?)(_.*?)?\.(xlsx)", "g");
         var match = myRegexp.exec(res.fileName);
         if(!!match){
           options.datePhoto = match[1];
